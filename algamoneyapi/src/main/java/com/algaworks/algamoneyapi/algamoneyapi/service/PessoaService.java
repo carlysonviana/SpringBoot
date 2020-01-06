@@ -2,6 +2,8 @@ package com.algaworks.algamoneyapi.algamoneyapi.service;
 
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
+
 import com.algaworks.algamoneyapi.algamoneyapi.model.Pessoa;
 import com.algaworks.algamoneyapi.algamoneyapi.repository.PessoaRepository;
 
@@ -17,22 +19,20 @@ public class PessoaService {
     private PessoaRepository pessoaRepository;
 
     public Pessoa atualizar(Long codigo, Pessoa pessoa) {
-        Optional<Pessoa> pessoaSalva = buscarPessoaPeloCodigo(codigo);
+        Pessoa pessoaSalva = buscarPessoaPeloCodigo(codigo);
         BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo");
         return pessoaRepository.save(pessoaSalva);
     }
 
     public void atualizarPropriedadeAtivo(Long codigo, Boolean ativo){
-        Optional<Pessoa> pessoaSalva = buscarPessoaPeloCodigo(codigo);
+        Pessoa pessoaSalva = buscarPessoaPeloCodigo(codigo);
         pessoaSalva.setAtivo(ativo);
         pessoaRepository.save(pessoaSalva);
     }
 
-    private Optional<Pessoa> buscarPessoaPeloCodigo(Long codigo) {
-        Optional<Pessoa> pessoaSalva = pessoaRepository.findById(codigo);
-        if (pessoaSalva == null) {
-            throw new EmptyResultDataAccessException(1);
-        }
+    private Pessoa buscarPessoaPeloCodigo(Long codigo) {
+        Pessoa pessoaSalva = pessoaRepository.findById(codigo).orElseThrow(EntityNotFoundException::new);
+        
         return pessoaSalva;
     }
 }
