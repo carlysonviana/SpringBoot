@@ -1,5 +1,7 @@
 package com.algaworks.algamoneyapi.algamoneyapi.model;
 
+import java.util.Objects;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,7 +20,7 @@ public class Pessoa{
     private String nome;
 
     @Embedded
-    private String endereco;
+    private Endereco endereco;
 
     @NotNull
     private boolean ativo;
@@ -39,11 +41,11 @@ public class Pessoa{
         this.nome = nome;
     }
 
-    public String getEndereco() {
+    public Endereco getEndereco() {
         return this.endereco;
     }
 
-    public void setEndereco(String endereco) {
+    public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
 
@@ -55,8 +57,23 @@ public class Pessoa{
         return this.ativo;
     }
 
-    public void setAtivo(boolean ativo) {
+    public void setAtivo(Boolean ativo) {
         this.ativo = ativo;
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Pessoa)) {
+            return false;
+        }
+        Pessoa pessoa = (Pessoa) o;
+        return Objects.equals(codigo, pessoa.codigo) && Objects.equals(nome, pessoa.nome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(codigo, nome);
+    }
 }

@@ -1,6 +1,5 @@
 package com.algaworks.algamoneyapi.algamoneyapi.resource;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,11 +9,10 @@ import javax.validation.Valid;
 import com.algaworks.algamoneyapi.algamoneyapi.event.RecursoCriadoEvent;
 import com.algaworks.algamoneyapi.algamoneyapi.model.Pessoa;
 import com.algaworks.algamoneyapi.algamoneyapi.repository.PessoaRepository;
+import com.algaworks.algamoneyapi.algamoneyapi.service.PessoaService;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -34,6 +31,9 @@ public class PessoaResource {
 
     @Autowired
     private PessoaRepository pessoaRepository;
+
+    @Autowired
+    private PessoaService pessoaService;
 
     @Autowired
     private ApplicationEventPublisher publisher;
@@ -53,7 +53,7 @@ public class PessoaResource {
     @GetMapping("{/codigo}")
     public ResponseEntity<?> buscarPeloCodigo(@PathVariable Long codigo){
         Optional<Pessoa> pessoa = pessoaRepository.findById(codigo);
-        return !pessoa.isEmpty() ? ResponseEntity.ok(pessoa) : ResponseEntity.notFound().build();
+        return Optional.empty() != null ? ResponseEntity.ok(pessoa) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{codigo}")
@@ -63,14 +63,15 @@ public class PessoaResource {
     }
 
     @PutMapping("/{codigo}")
-    public ResponseEntity<Optional<Pessoa>> atualizar(@PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa) {
-        Optional<Pessoa> pessoaSalva = pessoaRepository.findById(codigo);
-        if (pessoaSalva == null) {
-            throw new EmptyResultDataAccessException(1); 
-        }
-        BeanUtils.copyProperties(pessoa, pessoaSalva, "codigo");
-        pessoaRepository.save(pessoaSalva);
+    public ResponseEntity<Pessoa> atualizar(@PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa) {
+        Pessoa pessoaSalva = pessoaService.atualizar(codigo, pessoa);
         return ResponseEntity.ok(pessoaSalva);
+    }
+
+    @PutMapping("/{codigo}/ativo")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void atualizarPropriedadeAtivo(@PathVariable Long codigo, @RequestBody Boolean ativo){
+        pessoaService.atualizarPropriedadeAtivo(codigo, ativo);
     }
 
 }

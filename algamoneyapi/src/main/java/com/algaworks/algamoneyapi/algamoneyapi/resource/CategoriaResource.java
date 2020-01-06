@@ -1,6 +1,5 @@
 package com.algaworks.algamoneyapi.algamoneyapi.resource;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/categorias")
@@ -50,7 +48,7 @@ public class CategoriaResource {
     @GetMapping("/{codigo}")
     public ResponseEntity<?> buscarPeloCodigo(@PathVariable Long codigo) {
         Optional<Categoria> categoria = categoriaRepository.findById(codigo);
-        return !categoria.isEmpty() ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
+        return Optional.empty() != null ? ResponseEntity.ok(categoria) : ResponseEntity.notFound().build();
     }
 
     @DeleteMapping("/{codigo}")
